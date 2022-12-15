@@ -24,10 +24,16 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _shieldsVisualizer;
+    [SerializeField]
+    private GameObject _rightEngine, _leftEngine;
 
     [SerializeField]
     private int _score;
     private UIManager _uiManager;
+
+    [SerializeField]
+    private AudioClip _laserAudio;
+    private AudioSource _audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +41,7 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0, 0, 0);
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _audioSource = GetComponent<AudioSource>();
         if (_spawnManager == null)
         {
             Debug.LogError("The Spawn Manager is NULL.");
@@ -43,6 +50,15 @@ public class Player : MonoBehaviour
         if (_uiManager == null)
         {
             Debug.LogError("The UI Manager is NULL.");
+        }
+
+        if (_audioSource == null)
+        {
+            Debug.LogError("Audio source on the player is NULL.");
+        }
+        else 
+        {
+            _audioSource.clip = _laserAudio;
         }
     }
 
@@ -90,6 +106,8 @@ public class Player : MonoBehaviour
         {
             Instantiate(_laserPrefab, transform.position + new Vector3(0, 1.05f, 0), Quaternion.identity);
         }
+
+        _audioSource.Play();
     }
 
     public void Damage()
@@ -97,12 +115,20 @@ public class Player : MonoBehaviour
         if (_isShieldsActive == true)
         {
             _isShieldsActive = false;
-            //disable shields visualizer 
             _shieldsVisualizer.SetActive(false);           
             return;
         }        
 
         _lives -= 1;
+
+        if (_lives == 2)
+        {
+            _rightEngine.SetActive(true);
+        }
+        else if (_lives == 1)
+        {
+            _leftEngine.SetActive(true);
+        }
 
         _uiManager.UpdateLives(_lives);
 
@@ -142,12 +168,9 @@ public class Player : MonoBehaviour
     public void ShieldsActive()
     {
         _isShieldsActive = true;
-        //enable shield visualizer
         _shieldsVisualizer.SetActive(true);
     }
 
-    //method to add 10 to score
-    //communicate with the UI to update the score
     public void AddToScore(int points)
     {
         _score += points;
