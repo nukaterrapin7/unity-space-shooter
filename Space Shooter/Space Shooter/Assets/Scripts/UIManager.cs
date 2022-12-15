@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class UIManager : MonoBehaviour
     private Text _restartText;
 
     private GameManager _gameManager;
+    [SerializeField]
+    private GameObject _pauseMenuPanel;
+
 
     // Start is called before the first frame update
     void Start()
@@ -64,5 +68,16 @@ public class UIManager : MonoBehaviour
             _gameOverText.text = "";
             yield return new WaitForSeconds(0.5f);
         }
+    }
+
+    public void ResumeGame()
+    {
+        _pauseMenuPanel.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
